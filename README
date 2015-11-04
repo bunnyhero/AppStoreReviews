@@ -24,13 +24,14 @@ FUNCTIONS
     getReviews(appStoreId, appId)
         returns list of reviews for given AppStore ID and application Id
         return list format: [{"topic": unicode string, "review": unicode string, "rank": int}]
+        this also dumps each row into a csv file named "output.csv"
 
 COPYRIGHTS
     Apple AppStore reviews scrapper
-    version 2011-04-12
-    Tomek "Grych" Gryszkiewicz, grych@tg.pl
-    http://www.tg.pl
-
+    version 2015-11-04
+    modified by Gordon Reynolds
+    Original code by Tomek "Grych" Gryszkiewicz, grych@tg.pl
+     - http://www.tg.pl
     based on "Scraping AppStore Reviews" blog by Erica Sadun
      - http://blogs.oreilly.com/iphone/2008/08/scraping-appstore-reviews.html
     AppStore codes are based on "appstore_reviews" by Jeremy Wohl
