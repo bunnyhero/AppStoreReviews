@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 ''' Apple AppStore reviews scrapper
-    version 2011-04-12
-    Tomek "Grych" Gryszkiewicz, grych@tg.pl
-    http://www.tg.pl
-    
+    version 2015-11-04
+    Original code written by Tomek "Grych" Gryszkiewicz, grych@tg.pl
+     - http://www.tg.pl 
+    Modified by Gordon Reynolds
+     - http://nicelygroomedbeard.com
     based on "Scraping AppStore Reviews" blog by Erica Sadun
      - http://blogs.oreilly.com/iphone/2008/08/scraping-appstore-reviews.html
     AppStore codes are based on "appstore_reviews" by Jeremy Wohl
@@ -12,9 +13,12 @@
 import urllib2
 from elementtree import ElementTree
 import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import string
 import argparse
 import re
+import csv
 
 appStores = {
 'Argentina':          143505,
@@ -96,10 +100,16 @@ appStores = {
 'Uruguay':            143514
 }
 
+resultsFile = open("output.csv", 'wb')
+wr = csv.DictWriter(resultsFile, ['topic', 'review', 'version', 'user', 'rank'])
+wr.writeheader()
+
 def getReviews(appStoreId, appId,maxReviews=-1):
     ''' returns list of reviews for given AppStore ID and application Id
         return list format: [{"topic": unicode string, "review": unicode string, "rank": int}]
     ''' 
+
+
     reviews=[]
     i=0
     while True: 
@@ -110,9 +120,11 @@ def getReviews(appStoreId, appId,maxReviews=-1):
         i += 1
         if maxReviews > 0 and len(reviews) > maxReviews:
             break
+    
     return reviews
 
 def _getReviewsForPage(appStoreId, appId, pageNo):
+    
     userAgent = 'iTunes/9.2 (Macintosh; U; Mac OS X 10.6)'
     front = "%d-1" % appStoreId
     url = "http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%s&pageNumber=%d&sortOrdering=4&onlyLatestVersion=false&type=Purple+Software" % (appId, pageNo)
@@ -137,7 +149,10 @@ def _getReviewsForPage(appStoreId, appId, pageNo):
         if version_node is None:
             review["version"] = None
         else:
-            review["version"] = re.search("Version [^\n^\ ]+", version_node.tail).group()
+            try:
+                review["version"] = re.search("Version [^\n^\ ]+", version_node.tail).group()
+            except:
+                review["version"] = None
     
         user_node = node.find("{http://www.apple.com/itms/}HBoxView/{http://www.apple.com/itms/}TextView/{http://www.apple.com/itms/}SetFontStyle/{http://www.apple.com/itms/}GotoURL/{http://www.apple.com/itms/}b")
         if user_node is None:
@@ -160,6 +175,7 @@ def _getReviewsForPage(appStoreId, appId, pageNo):
             review["topic"] = topic_node.text
 
         reviews.append(review)
+        wr.writerow(review)
     return reviews
     
 def _print_reviews(reviews, country):
@@ -221,4 +237,3 @@ if __name__ == '__main__':
             except KeyError:
                 print "No such country %s!\n\nWell, it could exist in real life, but I dont know it." % country
             pass
-        
