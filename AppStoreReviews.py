@@ -133,9 +133,9 @@ def getReviews(appStoreId, appId, maxReviews=-1):
 def _getReviewsForPage(appStoreId, appId, pageNo):
 
     userAgent = "iTunes/9.2 (Macintosh; U; Mac OS X 10.6)"
-    front = "%d-1" % appStoreId
+    front = "%d" % appStoreId
     url = (
-        "http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%s&pageNumber=%d&sortOrdering=4&onlyLatestVersion=false&type=Purple+Software"
+        "https://itunes.apple.com/review/id%s?onlyLatestVersion=false&pageNumber=%d&sortOrdering=4&type=Purple+Software"
         % (appId, pageNo)
     )
     req = urllib2.Request(
